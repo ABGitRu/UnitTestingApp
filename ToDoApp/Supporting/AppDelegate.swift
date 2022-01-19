@@ -13,11 +13,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        #if targetEnvironment(simulator)
+        if let documentPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            print("Tasks file directory: \(documentPath)")
+        }
+        #endif
+
         return true
     }
 
-    // MARK: UISceneSession Lifecycle
+    // MARK: UISceneSession Liсвfecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.

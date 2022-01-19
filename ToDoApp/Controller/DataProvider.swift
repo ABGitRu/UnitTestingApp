@@ -24,6 +24,20 @@ extension DataProvider: UITableViewDelegate {
         case .done: return "Undone"
         }
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let section = Section(rawValue: indexPath.section) else { fatalError() }
+        switch section {
+        case .todo:
+            let task = taskManager?.task(at: indexPath.row)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "DidSelectRow"), object: self, userInfo: ["task": task!])
+        case .done: break
+        }
+    }
+    // TODO: needs test
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Section:\(section)"
+    }
 }
 
 extension DataProvider: UITableViewDataSource {
@@ -50,7 +64,7 @@ extension DataProvider: UITableViewDataSource {
         case .todo: task = taskManager.task(at: indexPath.row)
         case .done: task = taskManager.doneTask(at: indexPath.row)
         }
-        cell.configure(withTask: task)
+        cell.configure(withTask: task, done: task.isDone)
         return cell
         
         
@@ -58,5 +72,19 @@ extension DataProvider: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return Section.allCases.count
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        guard let section = Section(rawValue: indexPath.section) else { fatalError() }
+        guard let taskManager = taskManager else { fatalError() }
+        
+        switch section {
+        case .todo: taskManager.checkTask(at: indexPath.row)
+        case .done: taskManager.uncheckTask(at: indexPath.row)
+        }
+        
+        
+        tableView.reloadData()
     }
 }
